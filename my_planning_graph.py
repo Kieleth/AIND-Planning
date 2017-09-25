@@ -412,18 +412,17 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
+        # TODO test for Inconsistent Effects between nodes
         a1_action = node_a1.action
         a2_action = node_a2.action
         eff = a1_action.effect_add
         for ef in eff:
             if ef in a2_action.effect_rem:
-                # TODO test for Inconsistent Effects between nodes
                 return True
 
         eff = a1_action.effect_rem
         for ef in eff:
             if ef in a2_action.precond_pos:
-                # TODO test for Inconsistent Effects between nodes
                 return True
 
         return False
@@ -540,6 +539,7 @@ class PlanningGraph():
         :param node_s2: PgNode_s
         :return: bool
         """
+        # TODO test for Inconsistent Support between nodes
         not_mutex = set()
         for a1_node in node_s1.parents:
             for a2_node in node_s2.parents:
@@ -547,7 +547,6 @@ class PlanningGraph():
                    not_mutex.add(a1_node)
                    not_mutex.add(a2_node)
 
-        # TODO test for Inconsistent Support between nodes
         if not_mutex == set():
             return True
         return False
