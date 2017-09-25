@@ -50,6 +50,7 @@ class PrintableProblem(InstrumentedProblem):
 
 
 def run_search(problem, search_function, parameter=None):
+    #import pdb;pdb.set_trace()
 
     start = timer()
     ip = PrintableProblem(problem)
@@ -107,7 +108,7 @@ def show_solution(node, elapsed_time):
         print("{}{}".format(action.name, action.args))
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser(description="Solve air cargo planning problems " + 
+    parser = argparse.ArgumentParser(description="Solve air cargo planning problems " +
         "using a variety of state space search methods including uninformed, greedy, " +
         "and informed heuristic search.")
     parser.add_argument('-m', '--manual', action="store_true",
