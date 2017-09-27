@@ -27,11 +27,11 @@ PROBLEMS = [["Air Cargo Problem 1", air_cargo_p1],
             ["Air Cargo Problem 2", air_cargo_p2],
             ["Air Cargo Problem 3", air_cargo_p3]]
 SEARCHES = [["breadth_first_search", breadth_first_search, ""],
-            ['breadth_first_tree_search', breadth_first_tree_search, ""],
+            #['breadth_first_tree_search', breadth_first_tree_search, ""],
             ['depth_first_graph_search', depth_first_graph_search, ""],
-            ['depth_limited_search', depth_limited_search, ""],
+            #['depth_limited_search', depth_limited_search, ""],
             ['uniform_cost_search', uniform_cost_search, ""],
-            ['recursive_best_first_search', recursive_best_first_search, 'h_1'],
+            #['recursive_best_first_search', recursive_best_first_search, 'h_1'],
             ['greedy_best_first_graph_search', greedy_best_first_graph_search, 'h_1'],
             ['astar_search', astar_search, 'h_1'],
             ['astar_search', astar_search, 'h_ignore_preconditions'],
@@ -48,8 +48,8 @@ class PrintableProblem(InstrumentedProblem):
     def __repr__(self):
         return '{:^10d}  {:^10d}  {:^10d}'.format(self.succs, self.goal_tests, self.states)
 
-
-def run_search(problem, search_function, parameter=None):
+RESULTS = {}
+def run_search(problem, search_function, parameter=None, pname=None, search=None):
     #import pdb;pdb.set_trace()
 
     start = timer()
@@ -62,6 +62,7 @@ def run_search(problem, search_function, parameter=None):
     print("\nExpansions   Goal Tests   New Nodes")
     print("{}\n".format(ip))
     show_solution(node, end - start)
+    RESULTS[pname + '-' + search] = {'metrics': str(ip), "Plan length": len(node.solution()), "Time Elapsed": end - start}
     print()
 
 
@@ -101,6 +102,25 @@ def main(p_choices, s_choices):
             _h = None if not h else getattr(_p, h)
             run_search(_p, s, _h)
 
+def all():
+    #import pdb;pdb.set_trace()
+
+    problems = PROBLEMS
+    searches = SEARCHES
+
+    for pname, p in problems:
+
+        for sname, s, h in searches:
+            hstring = h if not h else " with {}".format(h)
+            print("\nSolving {} using {}{}...".format(pname, sname, hstring))
+
+            _p = p()
+            _h = None if not h else getattr(_p, h)
+            run_search(_p, s, _h, pname, sname + hstring)
+    print("Global results")
+    print( "{:<60} {:<35} {:<15} {:<15}".format('Search-Problem','Expansions    Goals    New Nodes','Plan lenght', 'Time Elapsed'))
+    for k, v in RESULTS.items():
+        print("{:<60} {:<35} {:<15} {:<15}".format(k, v['metrics'], v['Plan length'], v['Time Elapsed']))
 
 def show_solution(node, elapsed_time):
     print("Plan length: {}  Time elapsed in seconds: {}".format(len(node.solution()), elapsed_time))
@@ -117,12 +137,15 @@ if __name__=="__main__":
                         help="Specify the indices of the problems to solve as a list of space separated values. Choose from: {!s}".format(list(range(1, len(PROBLEMS)+1))))
     parser.add_argument('-s', '--searches', nargs="+", choices=range(1, len(SEARCHES)+1), type=int, metavar='',
                         help="Specify the indices of the search algorithms to use as a list of space separated values. Choose from: {!s}".format(list(range(1, len(SEARCHES)+1))))
+    parser.add_argument('-a', '--all', action="store_true")
     args = parser.parse_args()
 
     if args.manual:
         manual()
     elif args.problems and args.searches:
         main(list(sorted(set(args.problems))), list(sorted(set((args.searches)))))
+    if args.all:
+        all()
     else:
         print()
         parser.print_help()
